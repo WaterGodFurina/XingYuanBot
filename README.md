@@ -24,20 +24,20 @@
 git clone https://gitee.com/starry-language/xing-yuan-bot.git
 cd XingYuanBot
 
-安装依赖
-
+### 安装依赖
+```
 npm install
 
-配置与启动
-
+### 配置与启动
+```
 复制  config.example.js  为  config.js  并填入你的 QQ 号与协议端配置。
 
-运行主程序：
-
+### 运行主程序：
+```
 node index.js
 
 
-📅 开发计划 (Roadmap)
+### 📅 开发计划 (Roadmap)
 
 基础消息监听与回复
 权限管理系统
