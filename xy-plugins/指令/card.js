@@ -14,7 +14,7 @@ export function generateHelpCard() {
   ctx.fillStyle = '#e0e0ff';
   ctx.font = 'bold 24px sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('✨ 星愿机器人 · 指令帮助 ✨', W / 2, 50);
+  ctx.fillText('✨ 星缘机器人 · 指令帮助 ✨', W / 2, 50);
 
   // 分隔线
   ctx.strokeStyle = '#444466';
@@ -61,5 +61,5 @@ export function generateHelpCard() {
   ctx.font = '14px sans-serif';
   ctx.fillText('💡 更多功能正在开发中，敬请期待~', 30, H - 30);
 
-  return canvas.toBuffer('image/png');
+  return { type: 'image', file: canvas.toBuffer('image/png') };
 }

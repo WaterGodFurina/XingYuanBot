@@ -1,3 +1,6 @@
+import { generateHelpCard } from './card.js';
+import { pathToFileURL } from 'url';
+
 export default {
   name: '指令',
   // ✅ 统一加上前缀判断
@@ -5,7 +8,7 @@ export default {
     const hasPrefix = text.startsWith('#') || text.startsWith('/');
     if (!hasPrefix) return false;
     
-    return text.includes('帮助') || text.includes('状态') || text.includes('退出') || text.includes('权限') || text.includes('重启');
+    return text.includes('帮助') || text.includes('状态') || text.includes('退出') || text.includes('权限') || text.includes('重启'));
   },
   
   handle: async ({ text, chatId, isGroup, senderName, role }) => {
@@ -22,10 +25,9 @@ export default {
     }
 
     // ─── [ #帮助 ] 指令 ──────────────────────────────────
-    import { generateHelpCard } from './card.js'
     if (text.includes('帮助')) {
       const cardBuffer = generateHelpCard();
-      return { image: cardBuffer };
+      return { type: 'image', file: cardBuffer };
     }
 
     // ─── [ #状态 ] 指令 ──────────────────────────────────
@@ -67,7 +69,6 @@ export default {
         setTimeout(() => {
             process.exit(0);
         }, 2000);
-    }
 
     // ─── [ #退出 ] 指令 ──────────────────────────────────
     if (text.includes('退出')) {
@@ -82,4 +83,5 @@ export default {
 
     return null;
   }
-};
+}
+}

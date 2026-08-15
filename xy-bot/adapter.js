@@ -1,6 +1,12 @@
 import { WebSocketServer } from 'ws';
 import { loadPlugins } from './plugin-loader.js';
 import { getRole } from '../xy-config/config/permissions.js'; // ✅ 引入权限函数
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const WS_PORT = 3001;
 let plugins = [];
@@ -68,20 +74,52 @@ export async function connectOneBot() {
 }
 
 // 发送消息给 NapCat（使用 OneBot V11 标准格式）
-export async function sendMsg(chatId, text, isGroup) {
+export async function sendMsg(chatId, reply, isGroup) {
   if (!wsClient) return;
+
+  let messageSegs = [];
+
+  // 识别是图片还是文本
+  if (reply && typeof reply === 'object') {
+    // 图片格式：写临时文件后用本地路径发送（适配 LLOneBot）
+    const tempDir = path.join(__dirname, '../temp');
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir);
+    }
+
+    const fileName = `img_${Date.now()}.png`;
+    const filePath = path.join(tempDir, fileName);
+
+    const buffer = Buffer.from(reply.file.file);
+    fs.writeFileSync(filePath, buffer);
+
+    messageSegs.push({
+      type: 'image',
+      data: {
+        file: filePath
+      }
+    });
+  } else {
+    // 文本格式
+    messageSegs.push({
+      type: 'text',
+      data: {
+        text: String(reply)
+      }
+    });
+  }
 
   const payload = {
     action: 'send_msg',
     params: {
       message_type: isGroup ? 'group' : 'private',
       [isGroup ? 'group_id' : 'user_id']: chatId,
-      message: [
-        { type: 'text', data: { text: String(text) } }
-      ]
+      message: messageSegs
     }
   };
 
   wsClient.send(JSON.stringify(payload));
-  console.log(`[机器人 ➔ ${isGroup ? '群' : '私聊'} ${chatId}]: ${text}`);
+  
+  // 终端日志
+  console.log(`[机器人 -> ${isGroup ? '群' : '私聊'} ${chatId}]: ${reply.type === 'image' ? '[图片]' : reply}`);
 }
