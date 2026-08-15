@@ -29,9 +29,9 @@ cd XingYuanBot
 npm install
 ```
 ### 配置与启动
-```
-复制  config.example.js  为  config.js  并填入你的 QQ 号与协议端配置。
-```
+
+- 复制  config.example.js  为  config.js  并填入你的 QQ 号与协议端配置。
+
 ### 运行主程序：
 ```
 node index.js
