@@ -7,7 +7,7 @@
 - 📡 支持 NapCat、LLOneBot 协议端连接
 - 🔐 多级权限管理（大主人 / 小主人 / 管理员 / 普通成员）
 - 🔌 插件化架构，轻松扩展功能
-- 💾 基于 Redis 的数据存储
+- 💾 基于 Redis 的数据存储(暂不支持)
 
 ## 🚀 快速开始
 
@@ -19,7 +19,28 @@
 
 ### 安装步骤
 
-1. 克隆仓库
-```bash
+克隆仓库
+```
 git clone https://gitee.com/starry-language/xing-yuan-bot.git
 cd XingYuanBot
+
+安装依赖
+
+npm install
+
+配置与启动
+
+复制  config.example.js  为  config.js  并填入你的 QQ 号与协议端配置。
+
+运行主程序：
+
+node index.js
+
+
+📅 开发计划 (Roadmap)
+
+基础消息监听与回复
+权限管理系统
+Redis / SQLite 数据持久化支持
+更多实用插件（签到、群管等）
+
