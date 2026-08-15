@@ -1,0 +1,7 @@
+{
+  "name": "系统指令",
+  "type": "command",
+  "prefix": ["#", "/"],
+  "keywords": ["退出", "重启", "状态", "帮助"],
+  "entry": "index.js"
+}

@@ -1,0 +1,12 @@
+node_modules/
+xy-data/
+*.pem
+*.key
+*.env
+.DS_Store
+redis.yaml
+config.yaml
+xy-plugins/weather-plugin
+xy-plugins/ID-plugin
+xy-plugins/group-admin
+xy-plugins/auto-reply
