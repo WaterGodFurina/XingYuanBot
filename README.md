@@ -26,7 +26,7 @@ cd XingYuanBot
 ```
 ### 安装依赖
 ```
-npm install
+pnpm install
 ```
 ### 配置与启动
 
