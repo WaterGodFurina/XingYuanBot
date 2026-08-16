@@ -13,6 +13,7 @@
 
 ### 环境要求
 
+- 暂时只支持windows系统
 - Node.js 18+
 - Redis 数据库（不需要，待开发中）
 - NapCat / LLOneBot 协议端
