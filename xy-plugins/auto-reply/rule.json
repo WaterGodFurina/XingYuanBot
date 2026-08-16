@@ -1,0 +1,7 @@
+{
+  "name": "自动回复",
+  "type": "chat",
+  "needAt": false,
+  "keywords": ["你好", "在吗", "嗨", "hello"],
+  "entry": "index.js"
+}
