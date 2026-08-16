@@ -31,7 +31,7 @@ pnpm install
 ```
 ### 配置与启动
 
-- 复制  config.yaml.example  为  config.yaml  并填入你的 QQ 号进行权限配置。
+- 进入  xy-config/config  目录，复制  config.yaml.example  为  config.yaml ，并填入你的 QQ 号。
 
 ### 运行主程序：
 ```
