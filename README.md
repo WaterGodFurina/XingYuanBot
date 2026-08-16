@@ -36,7 +36,10 @@ pnpm install
 
 ### 运行主程序：
 ```
-node app.js
+二选一
+node app.js（开发环境）
+python script.py（生产环境）
+没有区别，只是第一次到后面是否正常重启
 ```
 ### 端口设计
 
