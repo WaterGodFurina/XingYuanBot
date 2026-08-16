@@ -25,24 +25,40 @@ export async function connectOneBot() {
     ws.on('message', async (data) => {
       try {
         const msg = JSON.parse(data.toString());
+        // 【优化】只提取核心信息打印，过滤掉无用的元数据
+        if (msg.post_type === 'message') {
+            // 1. 提取基础信息
+            const senderId = msg.sender?.user_id || msg.user_id;
+            const nickname = msg.sender?.card || msg.sender?.nickname || '未知用户';
+            const groupId = msg.group_id;
+            
+            // 2. 简单处理一下消息内容（防止内容太长刷屏）
+            // 这里我们只取原始消息的前50个字符作为预览
+            let contentPreview = JSON.stringify(msg.message).substring(0, 50); 
+
+            console.log(`[收到消息] 群:${groupId} | 用户:${nickname}(${senderId}) | 内容预览: ${contentPreview}...`);
+        }
+
         if (msg.post_type !== 'message') return;
 
         const isGroup = msg.message_type === 'group';
         const chatId = isGroup ? msg.group_id : msg.user_id;
-        const senderName = msg.sender?.nickname || '未知';
+        const senderName = msg.sender?.card || msg.sender?.nickname || '未知';
         const senderQQ = String(msg.user_id); // ✅ 提取发送者QQ号
 
-        // 提取文本
-        let text = '';
-        if (Array.isArray(msg.message)) {
-          for (const seg of msg.message) {
-            if (seg.type === 'text') {
-              text += seg.data.text.trim();
-            }
-          }
+       // 提取文本
+       let text = "";
+       if (Array.isArray(msg.message)) {
+       for (const seg of msg.message) {
+        
+        if (seg.type === 'text') {
+          text += seg.data.text.trim();
+        } else if (seg.type === 'at') {
+          const atId = seg.data.qq || seg.data.id || seg.data.user_id || seg.data.target;
+          text += `@${atId}`;
         }
-
-        if (!text) return;
+      }
+    }
 
         // ✅ 获取发送者的权限等级 (master / owner / admin / member)
         const role = getRole(senderQQ);

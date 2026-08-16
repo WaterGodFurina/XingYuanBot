@@ -1,5 +1,6 @@
 import { generateHelpCard } from './card.js';
 import { pathToFileURL } from 'url';
+import fs from 'fs';
 
 export default {
   name: '指令',
@@ -8,7 +9,7 @@ export default {
     const hasPrefix = text.startsWith('#') || text.startsWith('/');
     if (!hasPrefix) return false;
     
-    return text.includes('帮助') || text.includes('状态') || text.includes('退出') || text.includes('权限') || text.includes('重启'));
+    return text.includes('帮助') || text.includes('状态') || text.includes('退出') || text.includes('权限') || text.includes('重启');
   },
   
   handle: async ({ text, chatId, isGroup, senderName, role }) => {
@@ -26,8 +27,9 @@ export default {
 
     // ─── [ #帮助 ] 指令 ──────────────────────────────────
     if (text.includes('帮助')) {
-      const cardBuffer = generateHelpCard();
-      return { type: 'image', file: cardBuffer };
+      const imagePath = await generateHelpCard();
+      const buffer = fs.readFileSync(imagePath);
+      return { file: { file: buffer }};
     }
 
     // ─── [ #状态 ] 指令 ──────────────────────────────────
@@ -40,35 +42,35 @@ export default {
       return `◆ 运行状态：正常\n◆ 内存占用：${mem} MB\n◆ 运行时间：${uptime} 秒`;
     }
 
-    // ===== ( #重启 ) 指令 =====
+    // ===== (#重启) 指令 =====
     if (text.includes('重启')) {
         if (role !== 'master' && role !== 'owner') {
             return '❌ 权限不足：仅主人可执行重启操作。';
         }
 
-        const { sendMsg } = await import('../../xy-bot/adapter.js');
-        const { spawn } = await import('child_process');
+        const { sendMsg } = await import('../../xy-bot/adapter.js'); // 确保路径正确
+        await sendMsg(chatId, '🔃 机器人正在重启，请稍候...', isGroup);
 
-        await sendMsg(chatId, '🔷 机器人正在重启，请稍候...', isGroup);
+        try {
+            const { spawn } = await import('child_process');
+        
+            // 1. 将当前 Node 进程的 PID 传给 Python，方便它等下“杀旧开新”
+            const pyProcess = spawn('python', ['script.py', process.pid.toString()], {
+                detached: true,
+                stdio: 'ignore'
+            });
+        
+            pyProcess.unref();
 
-        // 1. 后台杀端口
-        spawn('python', ['script.py'], {
-            detached: true,
-            stdio: 'ignore',
-            shell: true
-        }).unref();
+            // 2. 延迟 2 秒后退出当前进程（把控制权交给 Python 去杀自己和开新窗口）
+            setTimeout(() => {
+                process.exit(0);
+            }, 2000);
 
-        // 2. 弹窗启动新进程
-        spawn('cmd.exe', ['/c', 'start', 'cmd', '/k', 'pnpm run app'], {
-            detached: true,
-            stdio: 'ignore',
-            shell: true
-        }).unref();
-
-        // 3. 延迟2秒再退出，确保子进程已经启动
-        setTimeout(() => {
-            process.exit(0);
-        }, 2000);
+        } catch (e) {
+            console.error('重启失败: ', e);
+        }
+    }
 
     // ─── [ #退出 ] 指令 ──────────────────────────────────
     if (text.includes('退出')) {
@@ -83,5 +85,4 @@ export default {
 
     return null;
   }
-}
 }

@@ -1,65 +1,82 @@
 import { createCanvas } from 'canvas';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join, resolve } from 'path';
 
-export function generateHelpCard() {
-  const W = 520;
-  const H = 400;
-  const canvas = createCanvas(W, H);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+const DATA_PATH = join(__dirname, 'menu.json');
+const TEMP_DIR  = resolve(__dirname, '../../temp');
+const IMG_PATH  = join(TEMP_DIR, 'help_card.png');
+const VER_PATH  = join(TEMP_DIR, 'version.txt');
+
+export async function generateHelpCard() {
+  if (!fs.existsSync(TEMP_DIR)) {
+    fs.mkdirSync(TEMP_DIR, { recursive: true });
+  }
+
+  const data = JSON.parse(fs.readFileSync(DATA_PATH, 'utf-8'));
+  const { version, title, footer, commands, categories } = data;
+
+  let oldVer = 0;
+  if (fs.existsSync(VER_PATH)) {
+    oldVer = parseInt(fs.readFileSync(VER_PATH, 'utf-8').trim()) || 0;
+  }
+
+  // 版本没变且图片存在，直接返回缓存
+  if (version === oldVer && fs.existsSync(IMG_PATH)) {
+    console.log('[Card] 版本未变化，使用缓存图片');
+    return IMG_PATH;
+  }
+
+  console.log('[Card] 检测到数据变化，正在重新生成帮助卡片...');
+
+  // 创建画布
+  const canvas = createCanvas(800, 600);
   const ctx = canvas.getContext('2d');
 
   // 背景
-  ctx.fillStyle = '#1e1e2f';
-  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#1a1a2e';
+  ctx.fillRect(0, 0, 800, 600);
 
   // 标题
-  ctx.fillStyle = '#e0e0ff';
-  ctx.font = 'bold 24px sans-serif';
-  ctx.textAlign = 'center';
-  ctx.fillText('✨ 星缘机器人 · 指令帮助 ✨', W / 2, 50);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 28px sans-serif';
+  ctx.fillText(title || '星缘机器人 · 帮助', 30, 50);
 
-  // 分隔线
-  ctx.strokeStyle = '#444466';
-  ctx.beginPath();
-  ctx.moveTo(30, 70);
-  ctx.lineTo(W - 30, 70);
-  ctx.stroke();
+  let y = 100;
+  // 遍历分类
+  for (const cat of categories) {
+    ctx.fillStyle = cat.color || '#a0d0ff';
+    ctx.font = 'bold 22px sans-serif';
+    ctx.fillText(cat.name, 30, y);
+    y += 40;
 
-  // 基础指令标题
-  ctx.fillStyle = '#a0d0ff';
-  ctx.font = 'bold 18px sans-serif';
-  ctx.textAlign = 'left';
-  ctx.fillText('📖 基础指令（所有人可用）', 30, 100);
+    ctx.font = '20px sans-serif';
+    ctx.fillStyle = '#e0e0e0';
+    for (const id of cat.items) {
+      const item = commands[id];
+      if (item) {
+        ctx.fillText(`${item.cmd} ${item.desc}`, 50, y);
+        y += 32;
+      }
+    }
+    y += 20;
+  }
 
-  // 基础指令内容
-  ctx.fillStyle = '#c0c0e0';
+  // 底部文字
+  ctx.fillStyle = '#888888';
   ctx.font = '16px sans-serif';
-  const lines = [
-    '#帮助  ·················  查看本帮助信息',
-    '#权限  ·················  查询自己的权限等级',
-  ];
-  lines.forEach((line, i) => {
-    ctx.fillText(line, 40, 130 + i * 28);
-  });
+  ctx.fillText(footer || '', 30, 570);
 
-  // 主人指令标题
-  ctx.fillStyle = '#ffd0a0';
-  ctx.font = 'bold 18px sans-serif';
-  ctx.fillText('👑 主人指令（仅主人可用）', 30, 210);
+  // 保存为图片
+  const buffer = canvas.toBuffer('image/png');
+  fs.writeFileSync(IMG_PATH, buffer);
 
-  // 主人指令内容
-  ctx.fillStyle = '#c0c0e0';
-  ctx.font = '16px sans-serif';
-  const ownerLines = [
-    '#状态  ·················  查看机器人运行状态',
-    '#退出  ·················  关闭机器人',
-  ];
-  ownerLines.forEach((line, i) => {
-    ctx.fillText(line, 40, 240 + i * 28);
-  });
+  // 写入版本号
+  fs.writeFileSync(VER_PATH, String(version));
 
-  // 底部提示
-  ctx.fillStyle = '#808080';
-  ctx.font = '14px sans-serif';
-  ctx.fillText('💡 更多功能正在开发中，敬请期待~', 30, H - 30);
-
-  return { type: 'image', file: canvas.toBuffer('image/png') };
+  console.log('[Card] 生成完毕，已保存到 temp/');
+  return IMG_PATH;
 }
