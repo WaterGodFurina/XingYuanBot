@@ -14,7 +14,7 @@
 ### 环境要求
 
 - Node.js 18+
-- Redis 数据库
+- Redis 数据库（不需要，待开发中）
 - NapCat / LLOneBot 协议端
 
 ### 安装步骤
