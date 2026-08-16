@@ -30,12 +30,22 @@ npm install
 ```
 ### 配置与启动
 
-- 复制  config.example.js  为  config.js  并填入你的 QQ 号与协议端配置。
+- 复制  config.example.js  为  config.js  并填入你的 QQ 号进行权限配置。
 
 ### 运行主程序：
 ```
 node index.js
 ```
+### 端口设计
+
+- 3001 ws反向
+- 3000 http服务端
+- 3002 http服务端
+
+### 端口介绍
+- 3001 由ws链接XingYuan-Bot
+- 3000 该端口为发送消息设计
+- 3002 调用三个群管功能进行设计
 
 ### 📅 开发计划 (Roadmap)
 
@@ -44,3 +54,7 @@ node index.js
 - Redis / SQLite 数据持久化支持
 - 更多实用插件(签到、群管等)
 
+### 已优化点
+- 优化了重启逻辑
+- 添加了禁言、踢人、解禁功能
+- 优化了菜单卡片
