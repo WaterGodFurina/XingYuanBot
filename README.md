@@ -17,7 +17,7 @@
 - Node.js 18+
 - Redis 数据库（不需要，待开发中）
 - NapCat / LLOneBot 协议端
-- python 3X
+- python 3X（仅运行环境要求）
 
 ### 安装步骤
 
