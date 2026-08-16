@@ -34,7 +34,7 @@ pnpm install
 
 ### 运行主程序：
 ```
-node index.js
+node app.js
 ```
 ### 端口设计
 
