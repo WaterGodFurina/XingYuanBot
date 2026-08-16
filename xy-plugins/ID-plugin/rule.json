@@ -1,7 +1,0 @@
-{
-  "name": "ID查询",
-  "type": "chat",
-  "needAt": true,
-  "keywords": ["群号", "群ID", "我的QQ", "群信息"],
-  "entry": "index.js"
-}
