@@ -5,8 +5,6 @@
   "main": "app.js",
   "scripts": {
     "app": "node app.js",
-    ".": "node app.js",
-    "dev": "node --watch app.js",
     "py": "python script.py"
   },
   "keywords": [
@@ -27,7 +25,6 @@
     "yaml": "^2.8.0"
   },
   "engines": {
-    "node": ">=18.0.0",
-    "pnpm": ">=8.0.0"
+    "node": ">=18.0.0"
   }
 }
