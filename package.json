@@ -6,7 +6,8 @@
   "scripts": {
     "app": "node app.js",
     ".": "node app.js",
-    "dev": "node --watch app.js"
+    "dev": "node --watch app.js",
+    "py": "python script.py"
   },
   "keywords": [
     "QQBot",
