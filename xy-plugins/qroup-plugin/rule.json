@@ -2,6 +2,6 @@
     "name": "",
     "type": "command",
     "prefix": ["#", "/"],
-    "keywords": ["踢", "禁言", "解禁"],
+    "keywords": ["踢人", "禁言", "解禁"],
     "entry": "index.js"
 }
