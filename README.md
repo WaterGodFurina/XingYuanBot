@@ -30,7 +30,7 @@ pnpm install
 ```
 ### 配置与启动
 
-- 复制  config.example.js  为  config.yaml  并填入你的 QQ 号进行权限配置。
+- 复制  config.yaml.example  为  config.yaml  并填入你的 QQ 号进行权限配置。
 
 ### 运行主程序：
 ```
