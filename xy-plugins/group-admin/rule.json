@@ -1,7 +1,0 @@
-{
-  "name": "群管理",
-  "type": "command",
-  "prefix": ["#", "/"],
-  "keywords": ["踢人", "禁言", "管理员"],
-  "entry": "index.js"
-}
