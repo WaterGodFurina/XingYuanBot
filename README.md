@@ -32,7 +32,7 @@ git clone https://github.com/xingyuanbianyu/XingYuanBot.git
 cd XingYuanBot
 
 GitCode用户使用这个
-https://gitcode.com/xingyuan3739/XingYuanBot.git
+git clone https://gitcode.com/xingyuan3739/XingYuanBot.git
 cd XingYuanBot
 ```
 ### 安装依赖
