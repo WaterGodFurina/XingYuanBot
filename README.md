@@ -41,10 +41,11 @@ pnpm install
 
 ### 运行主程序：
 ```
-二选一
-node app.js（开发环境）
-python script.py（生产环境）
-注：两者核心逻辑一致。Python 脚本主要用于生产环境下的进程守护与异常自动重启，确保服务稳定性。
+# 方式一：标准启动（推荐）
+node app.js
+
+# 方式二：带自动重启守护（需 Python 环境）
+python script.py
 ```
 ### 端口设计
 
