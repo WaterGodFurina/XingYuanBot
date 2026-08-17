@@ -30,6 +30,10 @@ cd XingYuanBot
 国外用户使用这个
 git clone https://github.com/xingyuanbianyu/XingYuanBot.git
 cd XingYuanBot
+
+GitCode用户使用这个
+https://gitcode.com/xingyuan3739/XingYuanBot.git
+cd XingYuanBot
 ```
 ### 安装依赖
 ```
