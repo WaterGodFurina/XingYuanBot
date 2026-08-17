@@ -61,6 +61,14 @@ pnpm install
 ### 配置与启动
 
 - 进入  xy-config/config  目录，复制  config.yaml.example  为  config.yaml ，并填入你的 QQ 号。
+将QQ替换为你的QQ号，其他的可以暂时不设置
+大致如下，需要以下内容
+```
+"你要设置成大主人的QQ号": true
+"你要设置成小主人的QQ号": false
+"你要设置成管理员的QQ号": null
+```
+以上配置只是示例，可以随便填一串数字，但不要填空
 
 ### 运行主程序：
 ```
