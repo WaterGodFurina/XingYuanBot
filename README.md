@@ -58,6 +58,10 @@ cd XingYuanBot
 ```
 pnpm install
 ```
+如果没有pnpm，请先运行如下指令安装
+```
+npm install -g pnpm
+```
 ### 配置与启动
 
 - 进入  xy-config/config  目录，复制  config.yaml.example  为  config.yaml ，并填入你的 QQ 号。
