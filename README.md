@@ -24,11 +24,11 @@
 克隆仓库
 ```
 国内用户使用这个
-git clone https://gitee.com/starry-language/xing-yuan-bot.git
+git clone https://gitee.com/starry-language/XingYuanBot.git
 cd XingYuanBot
 
 国外用户使用这个
-git clone https://github.com/xingyuanbianyu/XingYuan-Bot.git
+git clone https://github.com/xingyuanbianyu/XingYuanBot.git
 cd XingYuanBot
 ```
 ### 安装依赖
