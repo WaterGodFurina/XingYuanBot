@@ -78,6 +78,13 @@ node app.js
 # 方式二：带自动重启守护（需 Python 环境）
 python script.py
 ```
+这是使用pnpm进行启动
+```
+pnpm app或者pnpm run app
+则执行node app
+pnpm py或者pnpm run py
+则执行python script.py
+```
 ### 端口设计
 
 - 3001 ws反向
