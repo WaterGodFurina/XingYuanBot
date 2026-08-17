@@ -25,6 +25,9 @@
 ```
 git clone https://gitee.com/starry-language/xing-yuan-bot.git
 cd XingYuanBot
+
+git clone https://github.com/xingyuanbianyu/XingYuan-Bot.git
+cd XingYuanBot
 ```
 ### 安装依赖
 ```
