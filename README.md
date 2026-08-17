@@ -15,7 +15,7 @@
 
 - 暂时只支持windows系统
 - Node.js 18+
-- Redis 数据库（不需要，待开发中）
+- Redis 数据库（不需要，待开发中，仅作为后续选择）
 - NapCat / LLOneBot 协议端
 - python 3X（仅运行环境要求）
 
@@ -23,9 +23,11 @@
 
 克隆仓库
 ```
+国内用户使用这个
 git clone https://gitee.com/starry-language/xing-yuan-bot.git
 cd XingYuanBot
 
+国外用户使用这个
 git clone https://github.com/xingyuanbianyu/XingYuan-Bot.git
 cd XingYuanBot
 ```
@@ -66,3 +68,4 @@ python script.py（生产环境）
 - 优化了重启逻辑
 - 添加了禁言、踢人、解禁功能
 - 优化了菜单卡片
+- 待上传的优化
