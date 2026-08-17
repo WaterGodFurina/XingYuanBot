@@ -53,7 +53,7 @@ python script.py（生产环境）
 - 3002 http服务端
 
 ### 端口介绍
-- 3001 由ws链接XingYuan-Bot
+- 3001 用于ws链接XingYuan-Bot
 - 3000 该端口为发送消息设计
 - 3002：群管专用接口（处理禁言、踢人等指令）
 
