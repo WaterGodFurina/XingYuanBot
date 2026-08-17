@@ -2,6 +2,11 @@
 
 一个基于 Node.js 的轻量级 QQ 机器人框架，支持 NapCat / LLOneBot 协议端连接，内置灵活的权限管理系统和插件扩展机制。
 
+## 反馈方式
+- 电子邮箱：m1536_adjs318inp@aka.yeah.net
+- QQ群反馈：1026165109
+- QQ反馈：3381673433
+
 ## ✨ 功能特性
 
 - 📡 支持 NapCat、LLOneBot 协议端连接
