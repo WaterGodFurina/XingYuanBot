@@ -5,8 +5,7 @@
   "main": "app.js",
   "scripts": {
     "app": "node app.js",
-    "py": "python script.py",
-    "py": "python3 script.py"
+    "py": "python script.py"
   },
   "keywords": [
     "QQBot",
