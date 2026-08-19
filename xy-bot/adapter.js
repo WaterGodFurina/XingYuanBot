@@ -17,6 +17,7 @@ export async function connectOneBot() {
 
   const wss = new WebSocketServer({ port: WS_PORT });
   console.log(`◆ 机器人服务端已启动，监听端口 ${WS_PORT}...\n`);
+  console.log('ws连接: 127.0.0.1:3001')
 
   wss.on('connection', (ws) => {
     console.log('◆ NapCat 已连接！');
