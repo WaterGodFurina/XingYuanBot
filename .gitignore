@@ -13,5 +13,9 @@ xy-config/config.yaml
 xy-plugins/auto-reply
 xy-plugins/group-admin
 xy-plugins/ID-plugin
-xy0plugins/weather-plugin
+xy-plugins/weather-plugin
+xy-plugins/GH-plugin
 # 如果所有插件都是你自己写的，想备份到 Git，就不要忽略它们
+temp/*.pug
+temp/*.txt
+*.lnk

@@ -12,6 +12,10 @@ const myCommands = [
   { cmd: '#踢@成员', desc: '将指定成员踢出群聊' },
   { cmd: '#禁言@成员QQ号 秒', desc: '禁言指定成员，默认600秒' },
   { cmd: '#解禁@QQ号', desc: '解除指定成员的禁言' },
+  { cmd: '#头衔 内容', desc: '给自己设置专属头衔（需机器人是群主）' },
+  { cmd: '#设置管理@成员', desc: '将指定成员设为管理员（需大主人权限）' },
+  { cmd: '#取消管理@成员', desc: '将指定成员降为普通成员（需大主人权限）' },
+  { cmd: '#点赞', desc: '让机器人给你点赞（好友10次，非好友50次）' },
 ];
 
 function injectHelp() {
@@ -75,9 +79,24 @@ function parseText(text) {
   return textStr;
 }
 
+// 判断目标QQ是否为机器人好友
+async function checkIsFriend(targetQQ) {
+  try {
+    const res = await fetch(`${API}/get_friends`);
+    const data = await res.json();
+    if (data.status === 'ok' && data.data) {
+      const friends = data.data;
+      return friends.some(f => f.user_id === Number(targetQQ));
+    }
+  } catch (e) {
+    console.error('[群管] 获取好友列表失败:', e.message);
+  }
+  return false;
+}
+
 export default {
   name: '群管',
-  description: '匹配规则：消息包含 #踢/#禁言/#解禁 且后面有 @ 符号触发',
+  description: '匹配规则：消息包含 #踢/#禁言/#解禁/#头衔/#设置管理/#取消管理/#点赞 触发',
   match: (text) => {
     if (!text) return false;
     let textStr = parseText(text);
@@ -88,7 +107,9 @@ export default {
     if (!hasPrefix) return false;
 
     const cmd = textStr.replace(/^#s#|#/g, '').trim();
-    return cmd.startsWith('踢') || cmd.startsWith('禁言') || cmd.startsWith('解禁');
+    return cmd.startsWith('踢') || cmd.startsWith('禁言') || cmd.startsWith('解禁')
+        || cmd.startsWith('头衔') || cmd.startsWith('设置管理')
+        || cmd.startsWith('取消管理') || cmd.startsWith('点赞');
   },
 
   handle: async function({ text, chatId, isGroup, senderName, senderQQ, role }) {
@@ -105,7 +126,6 @@ export default {
 
     // 提取目标QQ号
     let targetQQ = null;
-
     if (Array.isArray(text)) {
       const atItem = text.find(item => item?.type === 'at');
       if (atItem && atItem.data && atItem.data.qq) {
@@ -114,39 +134,33 @@ export default {
     }
 
     if (!targetQQ) {
-        // 提取 @ 后面的非空白字符串（如 "芙芙" 或 "3758575163600"）
-        const match = textStr.match(/@([^\s]+)/);
-        if (match) {
-            const keyword = match[1];
-            try {
-                const memberRes = await fetch(`${API}/get_group_member_list?group_id=${chatId}`);
-                const memberData = await memberRes.json();
-                const members = memberData?.data || [];
+      const match = textStr.match(/@([^\s]+)/);
+      if (match) {
+        const keyword = match[1];
+        try {
+          const memberRes = await fetch(`${API}/get_group_member_list?group_id=${chatId}`);
+          const memberData = await memberRes.json();
+          const members = memberData?.data || [];
 
-                // 遍历寻找最匹配的群成员
-                const found = members.find(m => {
-                    const uid = String(m.user_id);
-                    // 1. 如果输入的是QQ号粘包（如 "3758575163600" 包含 "3758575163"）
-                    if (keyword.startsWith(uid)) return true;
-                    // 2. 如果输入的是昵称/群名片
-                    if ((m.nickname && keyword.includes(m.nickname)) || 
-                        (m.card && keyword.includes(m.card))) return true;
-                    return false;
-                });
+          const found = members.find(m => {
+            const uid = String(m.user_id);
+            if (keyword.startsWith(uid)) return true;
+            if ((m.nickname && keyword.includes(m.nickname)) ||
+                (m.card && keyword.includes(m.card))) return true;
+            return false;
+          });
 
-                if (found) {
-                    targetQQ = String(found.user_id);
-                    // 关键：如果是粘包，把QQ号从关键字里切掉，剩下的部分（如 "600"）留给后面的时长解析
-                    if (keyword.startsWith(targetQQ) && keyword.length > targetQQ.length) {
-                        // 将多余的数字还给 textStr，让后面的时长正则能重新匹配到
-                        const remaining = keyword.slice(targetQQ.length);
-                        textStr = textStr.replace(keyword, targetQQ + ' ' + remaining);
-                    }
-                }
-            } catch (e) {
-                console.error('匹配群成员失败:', e);
+          if (found) {
+            targetQQ = String(found.user_id);
+            if (keyword.startsWith(targetQQ) && keyword.length > targetQQ.length) {
+              const remaining = keyword.slice(targetQQ.length);
+              textStr = textStr.replace(keyword, targetQQ + ' ' + remaining);
             }
+          }
+        } catch (e) {
+          console.error('匹配群成员失败:', e);
         }
+      }
     }
 
     // 检查群权限
@@ -170,12 +184,119 @@ export default {
       if (configAdmin.includes(userRole)) hasPermission = true;
     }
 
-    if (!hasPermission) {
-      return '❌ 权限不足：此命令仅限群主、管理员或配置文件中的主人使用。';
+    // 大主人权限检查（设置管理、取消管理）
+    const isMaster = role === 'master';
+
+    // 点赞功能（无需任何权限，所有人都可以用）
+    if (cmd === '点赞' || cmd === '赞') {
+      const isFriend = await checkIsFriend(senderQQ);
+      const totalLikes = isFriend ? 10 : 50;
+      const perRequest = 10;
+      const requests = Math.ceil(totalLikes / perRequest);
+
+      try {
+        for (let i = 0; i < requests; i++) {
+          const times = i === requests - 1 ? (totalLikes % perRequest || perRequest) : perRequest;
+          const res = await fetch(`${API}/send_like`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              user_id: Number(senderQQ),
+              times: times
+            })
+          });
+          const result = await res.json();
+          if (result.status !== 'ok') {
+            return `❌ 点赞失败：${result.msg || result.message}`;
+          }
+        }
+        return `✅ 已为你点赞 ${totalLikes} 次！（${isFriend ? '检测到好友关系' : '非好友，额外多赞'}）`;
+      } catch (err) {
+        return `❌ 请求失败：${err.message}`;
+      }
+    }
+
+    // 设置管理（仅大主人）
+    if (cmd.startsWith('设置管理')) {
+      if (!isMaster) return '❌ 权限不足：此命令仅限配置文件中的大主人（master）使用。';
+      if (!targetQQ) return '⚠️ 用法：#设置管理@成员';
+
+      try {
+        const botRes = await fetch(`${API}/get_login_info`);
+        const botData = await botRes.json();
+        const botQQ = botData?.data?.user_id;
+
+        if (botQQ) {
+          const botInfoRes = await fetch(`${API}/get_group_member_info?group_id=${chatId}&user_id=${botQQ}`);
+          const botInfoData = await botInfoRes.json();
+          if (botInfoData?.data?.role !== 'owner') {
+            return '❌ Bot权限不足：机器人需要是群主才能设置管理员。';
+          }
+        }
+
+        const res = await fetch(`${API}/set_group_admin`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            group_id: Number(chatId),
+            user_id: Number(targetQQ),
+            enable: true
+          })
+        });
+        const result = await res.json();
+        if (result.status === 'ok') {
+          return `✅ 已成功将 ${targetQQ} 设置为管理员。`;
+        } else {
+          return `❌ 设置管理失败：${result.msg || result.message}`;
+        }
+      } catch (err) {
+        return `❌ 请求失败：${err.message}`;
+      }
+    }
+
+    // 取消管理（仅大主人）
+    if (cmd.startsWith('取消管理')) {
+      if (!isMaster) return '❌ 权限不足：此命令仅限配置文件中的大主人（master）使用。';
+      if (!targetQQ) return '⚠️ 用法：#取消管理@成员';
+
+      try {
+        const botRes = await fetch(`${API}/get_login_info`);
+        const botData = await botRes.json();
+        const botQQ = botData?.data?.user_id;
+
+        if (botQQ) {
+          const botInfoRes = await fetch(`${API}/get_group_member_info?group_id=${chatId}&user_id=${botQQ}`);
+          const botInfoData = await botInfoRes.json();
+          if (botInfoData?.data?.role !== 'owner') {
+            return '❌ Bot权限不足：机器人需要是群主才能取消管理员。';
+          }
+        }
+
+        const res = await fetch(`${API}/set_group_admin`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            group_id: Number(chatId),
+            user_id: Number(targetQQ),
+            enable: false
+          })
+        });
+        const result = await res.json();
+        if (result.status === 'ok') {
+          return `✅ 已成功取消 ${targetQQ} 的管理员身份。`;
+        } else {
+          return `❌ 取消管理失败：${result.msg || result.message}`;
+        }
+      } catch (err) {
+        return `❌ 请求失败：${err.message}`;
+      }
     }
 
     // 踢人
     if (cmd.startsWith('踢')) {
+      if (!targetQQ) return '⚠️ 用法：#踢@成员';
+      if (!hasPermission) return '❌ 权限不足：此命令仅限群主、管理员或配置文件中的主人使用。';
+
       try {
         const res = await fetch(`${API}/set_group_kick`, {
           method: 'POST',
@@ -199,21 +320,20 @@ export default {
 
     // 禁言
     if (cmd.startsWith('禁言')) {
-      let duration = 600;
+      if (!targetQQ) return '⚠️ 用法：#禁言@成员 [秒数]';
+      if (!hasPermission) return '❌ 权限不足：此命令仅限群主、管理员或配置文件中的主人使用。';
 
-      // 精确做法：从 cmd 中移除 targetQQ，剩下的数字才是时长
+      let duration = 600;
       let cmdClean = cmd;
       if (targetQQ) {
         cmdClean = cmd.replace(targetQQ, '');
       }
-
       const durationMatch = cmdClean.match(/(\d+)/);
       if (durationMatch) {
         duration = parseInt(durationMatch[1]) * 600;
       }
 
       try {
-        console.log('[调试] 准备禁言，参数为:', { chatId, targetQQ, duration });
         const res = await fetch(`${API}/set_group_ban`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -236,6 +356,9 @@ export default {
 
     // 解禁
     if (cmd.startsWith('解禁')) {
+      if (!targetQQ) return '⚠️ 用法：#解禁@成员';
+      if (!hasPermission) return '❌ 权限不足：此命令仅限群主、管理员或配置文件中的主人使用。';
+
       try {
         const res = await fetch(`${API}/set_group_ban`, {
           method: 'POST',
@@ -257,6 +380,56 @@ export default {
       }
     }
 
-    return '⚠️ 用法：\n#踢@成员\n#禁言@成员 时长\n#解禁@成员';
+    // 头衔
+    if (cmd.startsWith('头衔')) {
+      if (!hasPermission) return '❌ 权限不足：此命令仅限群主、管理员或配置文件中的主人使用。';
+
+      const titleContent = cmd.replace('头衔', '').trim();
+      if (!titleContent) return '⚠️ 用法：#头衔 头衔内容';
+
+      let botQQ = null;
+      try {
+        const loginRes = await fetch(`${API}/get_login_info`);
+        const loginData = await loginRes.json();
+        botQQ = loginData?.data?.user_id;
+      } catch (e) {
+        return '❌ 无法获取机器人信息，请检查API连接。';
+      }
+
+      if (!botQQ) return '❌ 获取机器人QQ号失败。';
+
+      try {
+        const botInfoRes = await fetch(`${API}/get_group_member_info?group_id=${chatId}&user_id=${botQQ}`);
+        const botInfoData = await botInfoRes.json();
+        const botRole = botInfoData?.data?.role;
+        if (botRole !== 'owner') {
+          return '❌ 操作失败：机器人当前不是群主，无法设置头衔。';
+        }
+      } catch (e) {
+        return '❌ 无法查询机器人权限状态：' + e.message;
+      }
+
+      try {
+        const res = await fetch(`${API}/set_group_special_title`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            group_id: Number(chatId),
+            user_id: Number(senderQQ),
+            special_title: titleContent
+          })
+        });
+        const result = await res.json();
+        if (result.status === 'ok') {
+          return `✅ 已成功将你的头衔设置为：【${titleContent}】`;
+        } else {
+          return `❌ 设置头衔失败：${result.msg || result.message}`;
+        }
+      } catch (err) {
+        return `❌ 请求失败：${err.message}`;
+      }
+    }
+
+    return '⚠️ 用法：\n#踢@成员\n#禁言@成员 时长\n#解禁@成员\n#头衔 内容\n#设置管理@成员（仅大主人）\n#取消管理@成员（仅大主人）\n#点赞';
   }
 };
