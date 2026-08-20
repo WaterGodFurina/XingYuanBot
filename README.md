@@ -44,19 +44,23 @@
 ### 安装步骤
 
 克隆仓库
-```
 国内用户使用这个
+```
 git clone https://gitee.com/starry-language/XingYuanBot.git
-cd XingYuanBot
-
+```
 国外用户使用这个
+```
 git clone https://github.com/xingyuanbianyu/XingYuanBot.git
-cd XingYuanBot
-
+```
 GitCode用户使用这个
+```
 git clone https://gitcode.com/xingyuan3739/XingYuanBot.git
+```
+统一使用下面这个指令进入项目目录
+```
 cd XingYuanBot
 ```
+
 ### 安装依赖
 ```
 pnpm install
