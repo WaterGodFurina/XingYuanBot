@@ -104,7 +104,7 @@ export async function sendMsg(chatId, reply, isGroup) {
       fs.mkdirSync(tempDir);
     }
 
-    const fileName = `img_${Date.now()}.png`;
+    const fileName = `pub.png`;
     const filePath = path.join(tempDir, fileName);
 
     const buffer = Buffer.from(reply.file.file);
