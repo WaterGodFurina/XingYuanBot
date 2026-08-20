@@ -36,6 +36,9 @@
 - Node.js 18+
 - Redis 数据库（不需要，待开发中，仅作为后续选择）
 - NapCat / LLOneBot 协议端
+- 如果没有以上两个协议端，请先前往任意一个地址进行安装
+- [安装NapCat地址](https://github.com/NapNeko/NapCatQQ/releases)
+- [安装LLOneBot地址](https://github.com/LLOneBot/LuckyLilliaBot/releases)
 - python 3X（仅运行环境要求）
 
 ### 安装步骤
