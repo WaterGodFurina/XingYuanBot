@@ -1,0 +1,5 @@
+{
+  "name": "插件分组",
+  "type": "event",
+  "entry": "index.js"
+}

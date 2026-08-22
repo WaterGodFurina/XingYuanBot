@@ -1,5 +1,4 @@
 // app.js
-import { startBot } from './xy-lib/bot.js';
 import { connectOneBot } from './xy-bot/adapter.js';
 
 async function main() {
