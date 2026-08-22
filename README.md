@@ -71,16 +71,7 @@ npm install -g pnpm
 ```
 ### 配置与启动
 
-- 进入  xy-config/config  目录，复制  config.yaml.example  为  config.yaml ，并填入你的 QQ 号。
-将QQ替换为你的QQ号，其他的可以暂时不设置
-大致如下，需要以下内容
-```
-"你要设置成大主人的QQ号": true，全局唯一
-"你要设置成小主人的QQ号": false，可以多个
-"你要设置成管理员的QQ号": null，可以多个
-这只是示例，不要将非注释写入文件中
-```
-以上配置只是示例，可以随便填一串数字，但不要填空
+- 已经实现自动创建配置，只需要启动项目，连接上协议端，具体如何设置主人，请看下面
 
 ### 运行主程序：
 ```
@@ -92,10 +83,8 @@ python script.py
 ```
 这是使用pnpm进行启动
 ```
-pnpm app或者pnpm run app
-则执行node app
-pnpm py或者pnpm run py
-则执行python script.py
+pnpm app或者pnpm run app→node app
+pnpm py或者pnpm run py→python script.py
 ```
 ### 端口设计
 
