@@ -1,16 +1,5 @@
-# 权限配置
-# true  = 大主人（全局唯一，只有一个）
-# false = 小主人（可以有多个）
-# null  = 管理员（可以有多个，不是主人）
-
 permissions:
-  # 主人（true = 大主人，false = 小主人）
   owners:
-    "QQ": true      # 大主人（只能有一个）
-    "QQ": false     # 小主人1
-    "QQ": false     # 小主人2
-
-  # 管理员（null 表示普通管理员）
   admins:
-    "QQ": null
-    "QQ": null
+  permission_switch:
+    

@@ -4,16 +4,63 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+// 配置文件路径
 const CONFIG_PATH = path.join(__dirname, './config.yaml');
+// 模板文件路径
+const EXAMPLE_PATH = path.join(__dirname, './config.yaml.example');
 
 let cache = null;
 
+/**
+ * 初始化配置文件
+ * 逻辑：如果 config.yaml 不存在，尝试复制 example，否则创建默认配置
+ */
+function initConfigFile() {
+    // 1. 检查主配置文件是否存在
+    if (!fs.existsSync(CONFIG_PATH)) {
+        console.log('检测到配置文件缺失，正在尝试初始化...');
+
+        // 2. 尝试寻找 example 模板
+        if (fs.existsSync(EXAMPLE_PATH)) {
+            try {
+                const content = fs.readFileSync(EXAMPLE_PATH, 'utf-8');
+                fs.writeFileSync(CONFIG_PATH, content, 'utf-8');
+                console.log('已根据 config.yaml.example 创建 config.yaml');
+            } catch (e) {
+                console.error('复制模板文件失败:', e);
+            }
+        } else {
+            // 3. 如果没有模板，创建一个最基础的默认配置
+            const defaultConfig = {
+                permissions: {
+                    owners: {},
+                    admins: {},
+                    permission_switch: {}
+                }
+            };
+            fs.writeFileSync(CONFIG_PATH, yaml.stringify(defaultConfig), 'utf-8');
+            console.log('未找到模板，已创建默认 config.yaml');
+        }
+    }
+}
+
+/**
+ * 加载配置
+ */
 function loadConfig() {
-  if (!cache) {
-    const content = fs.readFileSync(CONFIG_PATH, 'utf-8');
-    cache = yaml.parse(content);
-  }
-  return cache;
+    // 每次加载前，确保文件存在（这步很关键，防止报错）
+    initConfigFile();
+
+    // 强制重新读取，不使用旧缓存，确保拿到最新的（或者是刚生成的）文件内容
+    try {
+        const content = fs.readFileSync(CONFIG_PATH, 'utf-8');
+        cache = yaml.parse(content);
+    } catch (e) {
+        console.error('配置文件解析失败，请检查格式:', e);
+        return {}; // 返回空对象防止后续报错
+    }
+
+    return cache;
 }
 
 // 获取某人的实际可用角色（考虑权限开关）

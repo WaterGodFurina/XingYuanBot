@@ -109,18 +109,23 @@ export default {
     if (!masterQQ) {
       // 还没有大主人，进入验证流程
       if (args.length === 1) {
-        // 第一次触发：生成验证码
-        const code = generateCode();
-        verificationCodes.set(senderQQ, { code, time: Date.now() });
+       
+      // 第一次触发，生成验证码
+      const code = generateCode();
+      verificationCodes.set(sendQQ, { code, time: Date.now() });
 
-        console.log('\n' + '═'.repeat(50));
-        console.log('  ✧ 大主人权限设置验证码');
-        console.log(`  QQ号 : ${senderQQ}`);
-        console.log(`  验证码: ${code}`);
-        console.log(`  指令 : 设置主人 ${senderQQ} ${code}`);
-        console.log('═'.repeat(50) + '\n');
+      // 【修改点 1】：控制台日志保持不变，打印明文方便你自己看
+      console.log("\n===== 🛡️ 大主人权限设置验证码 =====");
+      console.log(`   QQ号 : ${sendQQ}`);
+      console.log(`   验证码: ${code}`); // 这里依然是明文
+      console.log(`   指令 : 设置主人 ${sendQQ} ${code}`);
+      console.log("====================================\n");
 
-        return `✅ 验证码已生成，请在控制台查看，然后发送："设置主人 ${senderQQ} ${code}"（5分钟内有效）`;
+      // 【修改点 2】：发送给群里的消息，把验证码替换成星号
+      // 假设验证码长度固定是5位，如果不是，可以用 '*'.repeat(code.length)
+      const maskedCode = "*****"; 
+
+      return `✅ 验证码已生成，请在控制台查看，然后发送：设置主人 ${sendQQ} ${maskedCode} (5分钟内有效)`;
       } else if (args.length === 3) {
         // 验证阶段：设置主人 <QQ> <验证码>
         const qq = args[1];
