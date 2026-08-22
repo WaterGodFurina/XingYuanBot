@@ -102,7 +102,7 @@ pnpm py或者pnpm run py→python script.py
 - 基础消息监听与回复
 - 权限管理系统
 - Redis / SQLite 数据持久化支持
-- 更多实用插件(签到、群管等)
+- 更多实用插件(签到等)
 
 ### 已优化点
 - 优化了重启逻辑
